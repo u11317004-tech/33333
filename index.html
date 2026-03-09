@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>顛倒邏輯 MP3 播放器</title>
+    <style>
+        body { font-family: sans-serif; background: #f0f0f0; display: flex; justify-content: center; padding: 50px; }
+        .player-card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 400px; }
+        .section { margin-bottom: 25px; padding: 15px; border: 1px solid #eee; border-radius: 10px; }
+        h3 { margin-top: 0; font-size: 0.9rem; color: #666; }
+        .volume-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
+        button { cursor: pointer; padding: 10px; border: 1px solid #ddd; background: #fff; border-radius: 5px; }
+        button:active { background: #eee; }
+        input[type="range"] { width: 100%; }
+        .info { font-size: 0.8rem; background: #fffbe6; padding: 10px; border-left: 5px solid #ffe58f; }
+    </style>
+</head>
+<body>
+
+<div class="player-card">
+    <h2>🎵 Paradox Player</h2>
+    
+    <div class="info">
+        <strong>控制說明：</strong><br>
+        • 播放：滑動下方滑桿至最右端<br>
+        • 停止：滑動下方滑桿至最左端<br>
+        • 快轉：拉動「時間位移」滑桿決定長度
+    </div>
+
+    <br>
+
+    <div class="section">
+        <h3>啟動動力 (播放/停止滑軌)</h3>
+        <input type="range" id="playTrigger" min="0" max="100" value="0">
+        <p id="playStatus">目前狀態：停止</p>
+    </div>
+
+    <div class="section">
+        <h3>時間跳躍 (位移滑桿)</h3>
+        <input type="range" id="seekSlider" min="-30" max="30" value="0">
+        <button onclick="applySeek()">執行跳躍</button>
+    </div>
+
+    <div class="section">
+        <h3>音量階梯 (離散按鈕)</h3>
+        <div class="volume-grid">
+            <button onclick="setVol(0)">0%</button>
+            <button onclick="setVol(0.25)">25%</button>
+            <button onclick="setVol(0.5)">50%</button>
+            <button onclick="setVol(0.75)">75%</button>
+            <button onclick="setVol(1)">100%</button>
+        </div>
+        <p id="volStatus">音量：50%</p>
+    </div>
+
+    <audio id="mainAudio" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+</div>
+
+<script>
+    const audio = document.getElementById('mainAudio');
+    const playTrigger = document.getElementById('playTrigger');
+    const playStatus = document.getElementById('playStatus');
+    const seekSlider = document.getElementById('seekSlider');
+
+    // 播放/停止：連續控制邏輯
+    playTrigger.addEventListener('input', (e) => {
+        const val = e.target.value;
+        if (val == 100) {
+            audio.play();
+            playStatus.innerText = "目前狀態：播放中";
+        } else if (val == 0) {
+            audio.pause();
+            playStatus.innerText = "目前狀態：已停止";
+        }
+    });
+
+    // 快轉：用連續滑桿決定要跳多少秒
+    function applySeek() {
+        audio.currentTime += parseInt(seekSlider.value);
+        seekSlider.value = 0; // 重置
+    }
+
+    // 音量：離散按鈕邏輯
+    function setVol(val) {
+        audio.volume = val;
+        document.getElementById('volStatus').innerText = `音量：${val * 100}%`;
+    }
+</script>
+
+</body>
+</html>
